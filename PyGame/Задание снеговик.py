@@ -1,70 +1,70 @@
+from tkinter import *
 import random
-import tkinter as tk
-from tkinter import messagebox
 
-class TicTacToe:
-    def __init__(self):
-        self.window = tk.Tk()
-        self.window.title("Крестики-нолики")
-        self.board = []
-        self.buttons = []
-        self.create_widgets()
-        self.reset_board()
-        
-    def create_widgets(self):
-        for i in range(9):
-            button = tk.Button(self.window, text=" ", font=("Arial", 24), width=5, height=2,
-                               command=lambda i=i: self.player_move(i))
-            button.grid(row=i // 3, column=i % 3)
-            self.buttons.append(button)
-    
-    def reset_board(self):
-        self.board = [" " for _ in range(9)]
-        for button in self.buttons:
-            button.config(text=" ", state=tk.NORMAL)
-    
-    def player_move(self, index):
-        if self.board[index] == " ":
-            self.board[index] = "X"
-            self.buttons[index].config(text="X", state=tk.DISABLED)
-            if self.check_winner("X"):
-                messagebox.showinfo("Игра окончена", "Вы победили!")
-                self.reset_board()
-            elif " " not in self.board:
-                messagebox.showinfo("Игра окончена", "Ничья!")
-                self.reset_board()
-            else:
-                self.computer_move()
-    
-    def computer_move(self):
-        empty_cells = [i for i, val in enumerate(self.board) if val == " "]
-        for marker in ["O", "X"]:
-            for move in empty_cells:
-                self.board[move] = marker
-                if self.check_winner(marker):
-                    self.board[move] = "O"
-                    self.buttons[move].config(text="O", state=tk.DISABLED)
-                    if marker == "O":
-                        messagebox.showinfo("Игра окончена", "Компьютер победил!")
-                        self.reset_board()
-                    return
-                self.board[move] = " "
-        move = random.choice(empty_cells)
-        self.board[move] = "O"
-        self.buttons[move].config(text="O", state=tk.DISABLED)
-        if self.check_winner("O"):
-            messagebox.showinfo("Игра окончена", "Компьютер победил!")
-            self.reset_board()
-    
-    def check_winner(self, marker):
-        win_patterns = [(0,1,2), (3,4,5), (6,7,8),
-                        (0,3,6), (1,4,7), (2,5,8),
-                        (0,4,8), (2,4,6)]
-        return any(self.board[a] == self.board[b] == self.board[c] == marker for a, b, c in win_patterns)
-    
-    def run(self):
-        self.window.mainloop()
+WIDTH = 900
+HEIGHT = 300
 
-if __name__ == "__main__":
-    game = TicTacToe()
-    game.run()
+PADDLE_WIDTH = 10
+PADDLE_HEIGHT = 150
+
+BALL_SPEED_MULTIPLIER = 1.05
+BALL_MAX_SPEED = 40
+BALL_SIZE = 30
+
+BALL_SPEED_X = 20
+BALL_SPEED_Y = BALL_SPEED_X
+BALL_VELOCITY_Y = BALL_SPEED_X
+
+LEFT_SCORE = 0
+RIGHT_SCORE = 0
+
+RIGHT_PADDLE_X = WIDTH - PADDLE_WIDTH
+
+def update_score(side):
+    global LEFT_SCORE, RIGHT_SCORE
+    if side == "right":
+        RIGHT_SCORE += 1
+        canvas.itemconfig(right_score_text, text=RIGHT_SCORE)
+    else:
+        LEFT_SCORE += 1
+        canvas.itemconfig(left_score_text, text=LEFT_SCORE)
+
+def reset_ball():
+    global BALL_SPEED_X
+    canvas.coords(ball, WIDTH / 2 - BALL_SIZE / 2, HEIGHT / 2 - BALL_SIZE / 2, WIDTH / 2 + BALL_SIZE / 2, HEIGHT / 2 + BALL_SIZE / 2)
+    BALL_SPEED_X = -(BALL_SPEED_X * -BALL_SPEED_Y) / abs(BALL_SPEED_X)
+
+def change_ball_direction(direction):
+    global BALL_SPEED_X, BALL_VELOCITY_Y
+    if direction == "strike":
+        BALL_VELOCITY_Y = random.randrange(-10, 10)
+        if abs(BALL_SPEED_X) < BALL_MAX_SPEED:
+            BALL_SPEED_X *= -BALL_SPEED_MULTIPLIER
+        else:
+            BALL_SPEED_X = -BALL_SPEED_X
+    else:
+        BALL_VELOCITY_Y = -BALL_VELOCITY_Y
+
+root = Tk()
+
+canvas = Canvas(root, width=WIDTH, height=HEIGHT, background="#003300")
+canvas.pack()
+
+canvas.create_line(PADDLE_WIDTH, 0, PADDLE_WIDTH, HEIGHT, fill="black")
+canvas.create_line(WIDTH - PADDLE_WIDTH, 0, WIDTH - PADDLE_WIDTH, HEIGHT, fill="black")
+canvas.create_line(WIDTH / 2, 0, WIDTH / 2, HEIGHT, fill="black")
+
+ball = canvas.create_oval(WIDTH / 2 - BALL_SIZE / 2, HEIGHT / 2 - BALL_SIZE / 2, WIDTH / 2 + BALL_SIZE / 2, HEIGHT / 2 + BALL_SIZE / 2, fill="green")
+left_paddle = canvas.create_line(PADDLE_WIDTH / 2, 0, PADDLE_WIDTH / 2, PADDLE_HEIGHT, width=PADDLE_WIDTH, fill="red")
+right_paddle = canvas.create_line(WIDTH - PADDLE_WIDTH / 2, 0, WIDTH - PADDLE_WIDTH / 2, PADDLE_HEIGHT, width=PADDLE_WIDTH, fill="blue")
+
+right_score_text = canvas.create_text(WIDTH - WIDTH / 6, PADDLE_HEIGHT / 4, text=RIGHT_SCORE, font="Arial 20", fill="white")
+left_score_text = canvas.create_text(WIDTH / 6, PADDLE_HEIGHT / 4, text=LEFT_SCORE, font="Arial 20", fill="white")
+
+PADDLE_SPEED = 20
+right_paddle_velocity = 0
+left_paddle_velocity = 0
+
+AI_PADDLE_SPEED = 20
+AI_PADDLE_X = 0
+AI_PADDLE_Y = 0
