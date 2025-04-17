@@ -6,6 +6,8 @@ import random
 import math
 from pygame.locals import QUIT, K_w, K_s, K_a, K_d, MOUSEBUTTONDOWN
 pg.init()
+pg.mixer.init()
+shot_sound = pg.mixer.Sound("shot.wav")
 WIDTH = 800
 HEIGHT = 600
 WHITE = (255, 255, 255)
@@ -84,6 +86,7 @@ class Player(pg.sprite.Sprite):
         if self.bullets_in_magazine > 0 and not self.reloading:
             self.bullets_in_magazine -= 1
             # Создаем пулю в позиции конца оружия с углом поворота оружия
+            shot_sound.play()
             bullet_pos = self.weapon.get_muzzle_position()
             return Bullet(bullet_pos[0], bullet_pos[1], self.weapon.angle)
 
