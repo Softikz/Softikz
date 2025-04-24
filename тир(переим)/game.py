@@ -32,6 +32,7 @@ target_img = pg.image.load("target.png").convert_alpha()
 target_hit_img = pg.image.load("target_hit.png").convert_alpha()
 buy_button_img = pg.image.load("buy_button.png").convert_alpha()
 barrier_img = pg.image.load("barrier.png").convert_alpha()
+shop_img = pg.image.load("shop.png").convert_alpha()
 
 """
 Игрок может:
@@ -339,6 +340,24 @@ class Barrier(pg.sprite.Sprite):
         self.rect.height = HEIGHT
 
 
+"""
+Кнопка магазина оружия:
+
+- Открывает меню поверх игры
+- Есть выбор оружия(в рамке находится фото оружия,снизу описание-характеристики)
+"""
+
+
+class Shop(pg.sprite.Sprite):
+    def __init__(self):  # Будет легче
+        super().__init__()
+        self.image = shop_img
+        self.rect = self.image.get_rect()
+        self.rect.x = 700
+        self.rect.y = 600
+
+
+# game
 def game():
     # Создание групп спрайтов вот тута сложно
     all_sprites = pg.sprite.Group()
@@ -355,8 +374,10 @@ def game():
     player.barrier = barrier
     all_sprites.add(barrier)
 
-    # Создание кнопки покупки
+    # Создание кнопки покупки и шопа
     buy_button = Button(buy_button_img, (WIDTH - 110, 10))
+    shop_button = Button(shop_img, (300, 300))
+
 
     # Создание таргетов
     for _ in range(10):
@@ -377,7 +398,7 @@ def game():
                     # Проверка не кликнули ли по кнопке покупки
                     if buy_button.is_clicked(event.pos):
                         if player.buy_magazines():
-                            print("Куплено 5 магазинов!")
+                            print("Куплено 2 магазина!")
                     else:
                         # пиу пиуу
                         bullet = player.shoot()
@@ -408,6 +429,7 @@ def game():
         screen.blit(background_img, (0, 0))
         all_sprites.draw(screen)
         buy_button.draw(screen)
+        shop_button.draw(screen)
         draw_ui(screen, player, score)
         pg.display.flip()
 
