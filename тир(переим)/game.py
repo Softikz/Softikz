@@ -33,6 +33,17 @@ target_hit_img = pg.image.load("target_hit.png").convert_alpha()
 buy_button_img = pg.image.load("buy_button.png").convert_alpha()
 barrier_img = pg.image.load("barrier.png").convert_alpha()
 shop_img = pg.image.load("shop.png").convert_alpha()
+rpg_img = pg.image.load("rpg.png").convert_alpha()
+minigun_img = pg.image.load("minigun.png").convert_alpha()
+sniper_img = pg.image.load("sniper.png").convert_alpha()
+explosion_img = pg.image.load("explosion.png").convert_alpha()
+# Состояния игры
+MENU = 0
+LEVEL1 = 1
+LEVEL2 = 2
+SHOP = 3
+game_state = MENU
+
 
 """
 Игрок может:
@@ -376,7 +387,7 @@ def game():
 
     # Создание кнопки покупки и шопа
     buy_button = Button(buy_button_img, (WIDTH - 110, 10))
-    shop_button = Button(shop_img, (300, 300))
+    shop_button = Button(shop_img, (600, 9))
 
 
     # Создание таргетов
